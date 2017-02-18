@@ -1,0 +1,17 @@
+
+
+----- Publishing Instructions -----
+Install-Package VSNugetProjectTools
+$version = '0.0.0.40'
+Update-ProjectVersion -Absolute $version
+Publish-SolutionProject -ProjectName "Library.AppSessionFramework.WPF" -NugetServer "http://nuget.phillipgivens.com/" -ApiKey keyofphillip
+pushd CodeGen.SessionProxies
+nuget Pack CodeGen.SessionProxies.nuspec 
+nuget push ("CodeGen.SessionProxies.{0}.nupkg" -f $version) -Source "http://nuget.phillipgivens.com/" -ApiKey keyofphillip
+popd
+# Copy CodeGen.SessionProxies.exe.config into MsBuildTasks.CodeGen/bin/Release
+pushd MsBuildTasks.CodeGen
+nuget Pack MsBuildTasks.CodeGen.nuspec 
+nuget push ("MsBuildTasks.CodeGen.{0}.nupkg" -f $version) -Source "http://nuget.phillipgivens.com/" -ApiKey keyofphillip
+popd
+

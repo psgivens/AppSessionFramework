@@ -1,0 +1,19 @@
+﻿<#@ include file="T4LibraryReference.tt" #>
+
+namespace Sample.Sessions {
+    public partial class MainSession : SessionBase {
+<# 
+	DefineProperty("SampleFlag", "bool"); 
+	DefineProperty("IsLoggedIn", "bool", isSetterPrivate: true); 
+
+	DefineOperation("DoAction");
+	DefineOperation("DoOtherAction");
+	DefineOperation("LogOut");
+
+	DefineSessionProperty("SubSession", "SubSession", isPartial: true);
+	DefineSessionProperty("LoginSession", "LoginSession", isPartial: true);
+
+	GenerateClassBody("MainSession"); 
+#>
+    }
+}

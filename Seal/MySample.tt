@@ -1,0 +1,21 @@
+﻿<#@ include file="AppSessionPartials.tt" #>
+<#= RequiredUsings #>
+
+// This is the output code from your template
+// you only get syntax-highlighting here - not intellisense
+namespace PhillipScottGivens.Seal{
+    public partial class MyGeneratedClass: SessionBase {
+<# 
+	DefineProperty("SampleFlag", "bool"); 
+	GenerateClassBody("MyGeneratedClass"); 
+#>
+    }
+
+	public partial class MyApplicationSession : SessionBase {
+<# 
+	DefineProperty("SampleFlag", "bool"); 
+	GenerateClassBody("MyApplicationSession"); 
+#>
+	}
+}
+

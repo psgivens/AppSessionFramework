@@ -1,0 +1,82 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seal", "Seal\Seal.csproj", "{18D88C4D-2005-46C7-B0AC-8FF7BB1C0B3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.PsgCore", "Library.PsgCore\Library.PsgCore.csproj", "{544B2574-D4C6-4B6A-B464-4BB4BC767225}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Libraries", "1.Libraries", "{76055E08-DA72-4042-A642-BE5CB6F65EE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGen.SessionProxies", "CodeGen.SessionProxies\CodeGen.SessionProxies.csproj", "{93729819-3B2E-4398-B64F-C14C8016C6ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.CodeGen", "2.CodeGen", "{136D70C3-06DD-4C96-ABD5-07CC92C1C24F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0.Notes", "0.Notes", "{BFE9A364-A7AE-4679-A7D1-F13A19957700}"
+	ProjectSection(SolutionItems) = preProject
+		Objectives.txt = Objectives.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.AppSessionFramework", "Library.AppSessionFramework\Library.AppSessionFramework.csproj", "{E582B853-0D75-43CA-BD6F-F49C3619C4FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.AppSessionFramework.Generators", "Library.AppSessionFramework.Generators\Library.AppSessionFramework.Generators.csproj", "{16AE302F-8744-4A35-A7B0-322D96F7434D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.AppSessionFramework.WPF", "Library.AppSessionFramework.WPF\Library.AppSessionFramework.WPF.csproj", "{AC2589FB-C386-4593-9AB6-FA1BF4928BC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Shell", "3. Shell", "{B19F6929-BAAC-4419-AB61-DB0DAC31CBEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seal.Wpf", "Seal.WPF\Seal.Wpf.csproj", "{7B0EAC54-422B-4318-93CD-8A2667AF2E5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seal.Proxies", "Seal.Proxies\Seal.Proxies.csproj", "{197BC681-6EF9-4EAD-94A3-E7AB2C97942C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{18D88C4D-2005-46C7-B0AC-8FF7BB1C0B3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D88C4D-2005-46C7-B0AC-8FF7BB1C0B3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D88C4D-2005-46C7-B0AC-8FF7BB1C0B3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D88C4D-2005-46C7-B0AC-8FF7BB1C0B3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{544B2574-D4C6-4B6A-B464-4BB4BC767225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{544B2574-D4C6-4B6A-B464-4BB4BC767225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{544B2574-D4C6-4B6A-B464-4BB4BC767225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{544B2574-D4C6-4B6A-B464-4BB4BC767225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93729819-3B2E-4398-B64F-C14C8016C6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93729819-3B2E-4398-B64F-C14C8016C6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93729819-3B2E-4398-B64F-C14C8016C6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93729819-3B2E-4398-B64F-C14C8016C6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E582B853-0D75-43CA-BD6F-F49C3619C4FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E582B853-0D75-43CA-BD6F-F49C3619C4FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E582B853-0D75-43CA-BD6F-F49C3619C4FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E582B853-0D75-43CA-BD6F-F49C3619C4FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16AE302F-8744-4A35-A7B0-322D96F7434D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16AE302F-8744-4A35-A7B0-322D96F7434D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16AE302F-8744-4A35-A7B0-322D96F7434D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16AE302F-8744-4A35-A7B0-322D96F7434D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC2589FB-C386-4593-9AB6-FA1BF4928BC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC2589FB-C386-4593-9AB6-FA1BF4928BC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC2589FB-C386-4593-9AB6-FA1BF4928BC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC2589FB-C386-4593-9AB6-FA1BF4928BC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B0EAC54-422B-4318-93CD-8A2667AF2E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B0EAC54-422B-4318-93CD-8A2667AF2E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B0EAC54-422B-4318-93CD-8A2667AF2E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B0EAC54-422B-4318-93CD-8A2667AF2E5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{197BC681-6EF9-4EAD-94A3-E7AB2C97942C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{197BC681-6EF9-4EAD-94A3-E7AB2C97942C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{197BC681-6EF9-4EAD-94A3-E7AB2C97942C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{197BC681-6EF9-4EAD-94A3-E7AB2C97942C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{544B2574-D4C6-4B6A-B464-4BB4BC767225} = {76055E08-DA72-4042-A642-BE5CB6F65EE1}
+		{93729819-3B2E-4398-B64F-C14C8016C6ED} = {136D70C3-06DD-4C96-ABD5-07CC92C1C24F}
+		{E582B853-0D75-43CA-BD6F-F49C3619C4FA} = {76055E08-DA72-4042-A642-BE5CB6F65EE1}
+		{16AE302F-8744-4A35-A7B0-322D96F7434D} = {76055E08-DA72-4042-A642-BE5CB6F65EE1}
+		{AC2589FB-C386-4593-9AB6-FA1BF4928BC2} = {76055E08-DA72-4042-A642-BE5CB6F65EE1}
+	EndGlobalSection
+EndGlobal

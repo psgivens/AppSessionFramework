@@ -1,0 +1,12 @@
+﻿<#@ include file="T4LibraryReference.tt" #>
+
+namespace Sample.Sessions {
+    public partial class SubSession : SessionBase {
+<# 
+	DefineProperty("MyFlag", "bool"); 
+	DefineOperation("DoSubAction");
+	DefineOperation("DoOtherSubAction");
+	GenerateClassBody("SubSession"); 
+#>
+    }
+}

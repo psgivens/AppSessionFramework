@@ -1,0 +1,322 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #> 
+<#@ import namespace="System.Globalization" #>
+<#+
+private string RequiredUsings{
+	get {
+		return string.Join("\n",
+			 "using PhillipScottGivens.Library.AppSessionFramework;",
+			 "using System.Collections.Generic;",
+			 "using System;");
+    }
+}
+
+private void GenerateOperationNames(){
+#>
+private static readonly IEnumerable<string> OperationNames = new string[] {
+<#+
+	foreach(var operation in _operations){    
+#>
+	"<#= operation.Name  #>",
+<#+
+
+	}
+#>
+};
+<#+
+}
+
+ private void GenerateStaticConstructor(string constructorName, string typeName)
+ {
+ #>
+static <#= constructorName #>(){
+<#+ 
+	foreach(var pair in _properties) {
+		if (_sessionPropertyNames.Contains(pair.Name)){
+#>
+    <#= pair.Name #>Property = SessionPropertyDescriptor<<#= pair.Type #>>.Register("<#= pair.Name #>", typeof(<#= typeName #>));
+<#+ 
+		}
+		else{
+#>
+    <#= pair.Name #>Property = DataPropertyDescriptor<<#= pair.Type #>>.Register("<#= pair.Name #>", typeof(<#= typeName #>));
+<#+ 
+        }
+    }
+
+	foreach(var operation in _operations) {
+#>
+    <#= operation.Name #>Operation = OperationDescriptor.Register("<#= operation.Name #>", typeof(<#= typeName #>));
+<#+ 
+    }
+
+	//foreach(var operation in _operations){    }
+
+	// Standard static constructor code here.
+#>
+    OnStaticConstruction();
+}
+static partial void OnStaticConstruction();
+<#+ 
+ }
+
+
+  private void GenerateInitializeSessionOverride()
+ {
+ #>
+protected override void InitializeSession() {
+<#+ 
+	PushIndent("    ");		
+	foreach(var pair in _properties) {	
+		T4EmitInitializeDataProperty(pair.Type, FieldName(pair.Name), pair.Name);		
+    }
+
+	foreach(var operation in _operations){
+		T4EmitInitializeOperation(FieldName(operation.Name), operation.Name);
+    }
+	PopIndent();
+	// Standard static constructor code here.
+#>
+}
+<#+ 
+ }
+
+ private class PropertyMetadata {
+	 public string Name			 { get; set; }
+	 public string Type			 { get; set; }
+	 public bool IsPartial		 { get; set; }
+	 public bool IsSetterPrivate { get; set; }
+	 public bool IsInternal		 { get; set; }
+ }
+  private List<PropertyMetadata> _properties = new List<PropertyMetadata>();
+ private void DefineProperty(string propertyName, string propertyType){
+	  DefineProperty(propertyName, propertyType, false, false, false);
+ }
+  private void DefineProperty(string propertyName, string propertyType, bool isPartial = false){
+	  DefineProperty(propertyName, propertyType, isPartial, false, false);
+  }
+  private void DefineProperty(string propertyName, string propertyType, bool isPartial, bool isSetterPrivate){
+	  DefineProperty(propertyName, propertyType, isPartial, isSetterPrivate, false);
+  }
+  private void DefineProperty(string propertyName, string propertyType, bool isPartial = false, bool isSetterPrivate = false, bool isInternal = false)
+  {
+	  _properties.Add(new PropertyMetadata
+      {
+		  Name = propertyName, 
+		  Type = propertyType,
+		  IsPartial = isPartial,
+		  IsSetterPrivate = isSetterPrivate,
+		  IsInternal = isInternal
+      });
+  }
+  private List<string> _sessionPropertyNames = new List<string>();
+  private void DefineSessionProperty(string propertyName, string propertyType)
+  { DefineSessionProperty(propertyName, propertyType, false); }
+  private void DefineSessionProperty(string propertyName, string propertyType, bool isPartial)
+  {
+	  _sessionPropertyNames.Add(propertyName);
+	  DefineProperty(propertyName, propertyType, isPartial);
+  }
+    
+  private class OperationMetadata {
+	  public string Name		{ get; set; }
+	  public bool IsInternal	{ get; set; }
+  }
+  private List<OperationMetadata> _operations = new List<OperationMetadata>();
+  private void DefineOperation(string operationName){
+	DefineOperation(operationName, false);
+  }
+  private void DefineOperation(string operationName, bool isInternal){
+	_operations.Add(new OperationMetadata { 
+		Name = operationName,
+		IsInternal = isInternal
+	});
+  }
+
+  
+  private void GenerateClassBody(string typeName)
+  {	  
+	  GenerateClassBody(typeName, typeName);
+  }
+
+  private void GenerateClassBody(string constructorName, string typeName)
+  { 
+	  WriteLine("");
+	  PushIndent("    " + "    ");
+	  WriteLine("#region DataPropertyDescriptor");
+	  foreach(var property in _properties)
+      {
+		  WriteLine(string.Format("{0} static readonly DataPropertyDescriptor<{1}> {2}Property;", 
+			  property.IsInternal ? "internal" : "public",
+			  property.Type, property.Name));
+      }
+	  WriteLine("#endregion");
+	  WriteLine("");
+	  WriteLine("#region OperationDescriptor");
+	  foreach(var operation in _operations)
+      {
+		  WriteLine("{0} static readonly OperationDescriptor {1}Operation;", 
+			  operation.IsInternal ? "internal" : "public",
+			  operation.Name);
+      }
+	  WriteLine("#endregion");
+	  WriteLine("");
+
+	  WriteLine("#region Setup and Teardown");
+	  GenerateOperationNames();
+	  GenerateStaticConstructor(constructorName, typeName);
+	  GenerateInitializeSessionOverride();	  
+	  WriteLine("#endregion");
+
+	  foreach(var property in _properties) {		  
+		  T4EmitDataPropertyParts(property.IsInternal ? "internal" : "public",
+			property.Type, FieldName(property.Name), property.Name, property.IsPartial, property.IsSetterPrivate);		  
+      }
+	  foreach(var operation in _operations){
+		  T4EmitOperationParts(operation.IsInternal ? "internal" : "public",
+			FieldName(operation.Name), operation.Name);
+      }
+	  PopIndent();
+	  _properties.Clear();
+  }
+
+internal void T4EmitDataPropertyParts(string accessor, string returnType, string fieldName, string propertyName, bool isPartial, bool isSetterPrivate)
+{
+#>
+
+#region <#= propertyName #>
+private DataPropertyStore<<#= returnType #>> <#= fieldName #>Store;
+private EventHandler <#= fieldName #>Changed;
+private EventHandler <#= fieldName #>AvailabilityChanged;
+
+<#+ if (isPartial) { #>
+// Stub:public <#= returnType #> <#= propertyName #> {
+// Stub:	get { return this.GetValue(<#= propertyName #>Property); }
+// Stub:	set { this.SetValue(<#= propertyName #>Property, value); }
+// Stub:}
+<#+ } else { #>
+public <#= returnType #> <#= propertyName #> {
+	get { return this.GetValue(<#= propertyName #>Property); }
+	<#+ if (isSetterPrivate) { #>private <#+ } #>set { this.SetValue(<#= propertyName #>Property, value); }
+}
+<#+ } #>
+
+[NotifyConsumer]
+private void <#= propertyName #>_ValueChanged(object sender, EventArgs e)
+{
+    if (<#= fieldName #>Changed != null)
+        <#= fieldName #>Changed(this, e);
+}
+[NotifyConsumer]
+private void <#= propertyName #>_IsAvailableChanged(object sender, EventArgs e)
+{
+    if (<#= fieldName #>AvailabilityChanged != null)
+        <#= fieldName #>AvailabilityChanged(this, e);
+}
+<#= accessor #> virtual bool Is<#= propertyName #>Available
+{
+    get { return <#= fieldName #>Store.IsAvailable; }
+}
+/// <summary>
+/// Event meant to notify the client that Is<#= propertyName #>Available has changed. 
+/// </summary>
+/// <remarks>
+/// This event will not be raised until the stack is unwinding from the application layer. 
+/// </remarks>
+<#= accessor #> event EventHandler Is<#= propertyName #>AvailableChanged
+{
+    add { <#= fieldName #>AvailabilityChanged += value; }
+    remove { <#= fieldName #>AvailabilityChanged -= value; }
+}
+/// <summary>
+/// Event meant to notify the client that <#= propertyName #> has changed. 
+/// </summary>
+/// <remarks>
+/// This event will not be raised until the stack is unwinding from the application layer. 
+/// </remarks>
+<#= accessor #> event EventHandler <#= propertyName #>Changed
+{
+    add { <#= fieldName #>Changed += value; }
+    remove { <#= fieldName #>Changed -= value; }
+}
+#endregion
+<#+ 
+}
+
+internal void T4EmitOperationParts(string accessor, string fieldName, string operationName)
+{
+#>
+
+#region <#= operationName #>
+private Operation <#= fieldName #>Store;
+private EventHandler <#= fieldName #>AvailabilityChanged;
+
+[NotifyConsumer]
+private void <#= operationName #>_IsAvailableChanged(object sender, EventArgs e)
+{
+    if (<#= fieldName #>AvailabilityChanged != null)
+        <#= fieldName #>AvailabilityChanged(this, e);
+}
+<#= accessor #> virtual bool Is<#= operationName #>Available
+{
+    get { return <#= fieldName #>Store.IsAvailable; }
+}
+/// <summary>
+/// Event meant to notify the client that Is<#= operationName #>Available has changed. 
+/// </summary>
+/// <remarks>
+/// This event will not be raised until the stack is unwinding from the application layer. 
+/// </remarks>
+<#= accessor #> event EventHandler Is<#= operationName #>AvailableChanged
+{
+    add { <#= fieldName #>AvailabilityChanged += value; }
+    remove { <#= fieldName #>AvailabilityChanged -= value; }
+}
+#endregion
+<#+ 
+}
+
+
+internal void T4EmitInitializeOperation(string fieldName, string operationName){
+#>
+Proxy_RegisterOperation("<#= operationName #>", () => <#= operationName #>());
+<#= fieldName #>Store = GetStore(<#= operationName #>Operation);
+<#= fieldName #>Store.IsAvailableChanged += <#= operationName #>_IsAvailableChanged;
+<#+
+}
+
+internal void T4EmitInitializeDataProperty(string returnType, string fieldName, string propertyName)
+{
+#>
+<#= fieldName #>Store = GetStore(<#= propertyName #>Property);
+<#= fieldName #>Store.ValueChanged += <#= propertyName #>_ValueChanged;
+<#= fieldName #>Store.IsAvailableChanged += <#= propertyName #>_IsAvailableChanged;
+<#+ 
+}
+
+/// <summary>
+/// Returns the passed in identifier with the first letter changed to lowercase
+/// </summary>
+private string FieldName(string identifier)
+{
+    if (String.IsNullOrEmpty(identifier))
+    {
+        return "_" + identifier;
+    }
+	
+    if (identifier.Length == 1)
+    {
+        return "_" + identifier[0].ToString(CultureInfo.InvariantCulture);//.ToLowerInvariant();
+    }
+	
+    return "_" + identifier[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + identifier.Substring(1);
+}
+#>

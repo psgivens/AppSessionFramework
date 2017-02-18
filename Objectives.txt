@@ -1,0 +1,58 @@
+
+
+
+The end goal is to combine the proxy generation from Chainsaw 4 and Pandora before that with the UI and IoC work of Insight. 
+
+----- AppSessionFramework -----
+x..1) Rename Seal sln to AppSessionFramework.
+2) Merge WpfUtiliteis (from Insight) into Library.AppSessionFramework.Wpf
+x..3) Turn CodeGen projects into MSBuild tasks.
+x..  a. Use project build target as source assembly for reflection purposes. 
+x..  b. Execute from AppDomain and unload. (Used ExecTask instead)
+x..4) Change build paths to be lib/net40
+5) Package Library.AppSessionFramework.* into nuget packages
+  a. Create a "tools" directory under the sln root and move code 
+     generators and t4 libraries into it. 
+  b. Modify target project to install CodeGen MSBuild Tasks
+  c. On install, ask user for target proxy project into which to write.
+6) Write a sample application, such as a Calculator.
+
+
+Figure out how to package tools such as .exe and .tt to shared location.
+
+
+
+
+
+
+----- MSBuild Task Elaboration -----
+Inputs:
+  version = version
+  path of the tool = Solution + packages + tool name + version + "tools"
+  tool name = name of executable
+  assembly to proxy = assembly to proxy
+  code generator = name of code generator
+
+----- Publishing with Nuget -----
+  Add t4 library to target project
+  Add/Update msbuild task using-tag to tools directory with version number
+  Add msbuild task to target project to proxy sessions
+  Ask user if a proxy project needs to be created or use existing. 
+  Create proxy project
+  Add references to proxy project which mirror target project. 
+
+----- VSNugetProjectTools -----
+x..  Allow update version to work even if some projects do not have version numbers.
+x..  Get rid of templ.nuspec files. (We do not need them)
+x..  For pack and publish, skip projects which do not have nuspec files.
+  We may not need a script for the purpose of publishing, just like we do not
+    need one for packing. 
+  
+
+----- Insight.Shell -----
+1) Create a solution for Insight.Shell
+2) Convert Insight.Shell.AppSession base classes to work properly with 
+   AppSessionFramework
+3) Finesse Insight.Shell.Wpf to work with the rest of the changes
+4) Change the UI to be Elysium instead of CustomChromeLibrary
+5) Write a sample application, such as a Calculator

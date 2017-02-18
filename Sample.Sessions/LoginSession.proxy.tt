@@ -1,0 +1,16 @@
+﻿<#@ include file="T4LibraryReference.tt" #>
+
+namespace Sample.Sessions {
+    public partial class LoginSession : SessionBase {
+<# 
+	DefineProperty("UserName", "string");
+	DefineProperty("Password", "string");
+	DefineProperty("NewUserName", "string");
+	DefineProperty("NewPassword1", "string");
+	DefineProperty("NewPassword2", "string");
+	DefineOperation("Login");
+	DefineOperation("Register");
+	GenerateClassBody("LoginSession"); 
+#>
+    }
+}

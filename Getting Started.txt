@@ -1,0 +1,86 @@
+
+----- Using AppSessionFramework.0.0.0.23 -----
+1. Create project <project>.Sessions
+1.a. Install-Package CodeGen.SessionProxies
+1.b. Install-Package Library.AppSessionFramework
+1.c. Unload project and add this to the end of the file:
+  <UsingTask TaskName="GenerateSessionProxies" AssemblyFile="$(SolutionDir)packages\CodeGen.SessionProxies.0.0.0.14\tools\CodeGen.SessionProxies.exe" />
+  <Target Name="AfterBuild">
+    <GenerateSessionProxies RootNamespace="$(RootNamespace)" SolutionDir="$(SolutionDir)" TargetPath="$(TargetPath)" CodeGenerator="CodeGen.SessionProxies" OutputFolder="FantasticApp.Proxies" />
+  </Target>
+
+1.d. Create a t4 reference file with the following:
+	<#@ include file="..\packages\CodeGen.SessionProxies.0.0.0.14\tools\AppSessionPartials.tt" once="true" #>
+	<#= RequiredUsings #>
+1.e. Create proxy t4 MainSession like this
+	<#@ include file="T4LibraryReference.tt" #>
+	
+	namespace FantasticApp {
+	    public partial class MainSession : SessionBase{
+	<# 
+		DefineProperty("SampleFlag", "bool"); 
+		DefineOperation("DoAction");
+		DefineOperation("DoOtherAction");
+		GenerateClassBody("MainSession"); 
+	#>
+	    }
+	}
+
+1.f. Create cs MainSession like this
+	using PhillipScottGivens.Library.AppSessionFramework;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	
+	namespace FantasticApp {
+	    /// <summary>
+	    /// This is the MainSession
+	    /// </summary>
+		public partial class MainSession {
+		    /// <summary>
+		    /// This is the .ctor
+		    /// </summary>
+		    public MainSession() {
+		        var sampleFlagValue = CreateDynamicBoolean(SampleFlagProperty, false);
+		        SetAvailabilityCalculator(DoOtherActionOperation, sampleFlagValue);
+		        SetAvailabilityCalculator(DoActionOperation, sampleFlagValue.Not);
+		    }
+
+		    /// <summary>
+		    /// This is the Operator
+		    /// </summary>
+		    /// <remarks>
+		    /// Have fun.
+		    /// </remarks>
+		    /// <example>
+		    /// mainSession.DoAction()
+		    /// </example>
+		    public virtual void DoAction() {
+		        SampleFlag = !SampleFlag;
+		        var b = IsAvailable(DoActionOperation);
+		    }
+
+
+		    /// <summary>
+		    /// This is a field called Value;
+		    /// </summary>
+		    public const int Value = 13;
+		    /// <summary>
+		    /// This is a property called IsSuccess
+		    /// </summary>
+		    public bool IsSuccess { get; set; }
+
+		    public virtual void DoOtherAction() {
+		        SampleFlag = !SampleFlag;
+		    }
+		}	    
+	}
+	
+
+2. Create project <project>.Sessions.Proxies
+2.a. Install-Package Library.AppSessionFramework
+2.b. Add a folder called Generated
+2.b. Build the solution (specifically <project>.Sessions.csproj)
+2.c. The last step generated a file called SessionProxies.cs in the Generated folder. Include it in the project. 

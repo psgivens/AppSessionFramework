@@ -1,0 +1,16 @@
+﻿<Window x:Class="Sample.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <StackPanel>
+        <Button Command="{Binding DoAction}" Content="Toggle Sample Flag" />
+        <Button Command="{Binding DoOtherAction}" Content="Also toggle Samle Flag" />
+        <Button Command="{Binding LogOut}" Content="Log out" />
+        <CheckBox IsChecked="{Binding SampleFlag}" />
+        <ContentControl  Content="{Binding SubSession}" ContentTemplateSelector="{StaticResource TemplateSelector}"
+                         Visibility="{Binding IsSubSessionAvailable, Converter={StaticResource booleanToVisibilityConverter}}"
+                         />
+        <ContentControl  Content="{Binding LoginSession}" ContentTemplateSelector="{StaticResource TemplateSelector}" />
+        <TextBlock Text="logged In!" Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanToVisibilityConverter}}" />
+    </StackPanel>
+</Window>

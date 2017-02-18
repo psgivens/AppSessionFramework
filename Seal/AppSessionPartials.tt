@@ -1,0 +1,196 @@
+﻿<#@ template  debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="System.Core" #>
+<#@ Assembly Name="System.Windows.Forms" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #> 
+<#@ import namespace="System.Globalization" #>
+<#+
+private string RequiredUsings{
+	get {
+		return string.Join("\n",
+			 "using PhillipScottGivens.Library.AppSessionFramework;",
+			 "using System;");
+    }
+}
+
+ private void GenerateStaticConstructor(string constructorName, string typeName)
+ {
+ #>
+static <#= constructorName #>(){
+<#+ 
+	foreach(var pair in properties)
+    {
+#>
+    <#= pair.Name #>Property = DataPropertyDescriptor<<#= pair.Type #>>.Register("<#= pair.Name #>", typeof(<#= typeName #>));
+<#+ 
+    }
+	// Standard static constructor code here.
+#>
+    OnStaticConstruction();
+}
+static partial void OnStaticConstruction();
+<#+ 
+ }
+
+
+  private void GenerateVirtualInitializeSession()
+ {
+ #>
+protected virtual void InitializeSession(){
+<#+ 
+	foreach(var pair in properties)
+    {
+		PushIndent("    ");		
+		T4EmitInitializeDataProperty(pair.Type, FieldName(pair.Name), pair.Name);
+		PopIndent();
+    }
+	// Standard static constructor code here.
+#>
+}
+<#+ 
+ }
+
+ private class PropertyMetadata {
+	 public string Name    { get; set; }
+	 public string Type    { get; set; }
+	 public bool IsPartial { get; set; }
+ }
+  private List<PropertyMetadata> properties = new List<PropertyMetadata>();
+  private void DefineProperty(string propertyName, string propertyType) {
+	  DefineProperty(propertyName, propertyType, false);
+  }
+  private void DefineProperty(string propertyName, string propertyType, bool isPartial)
+  {
+	  properties.Add(new PropertyMetadata
+      {
+		  Name = propertyName, 
+		  Type = propertyType,
+		  IsPartial = isPartial
+      });
+  }
+  
+  private void GenerateClassBody(string typeName)
+  {	  
+	  GenerateClassBody(typeName, typeName);
+  }
+
+  private void GenerateClassBody(string constructorName, string typeName)
+  { 
+	  WriteLine("");
+	  PushIndent("    " + "    ");
+	  WriteLine("#region DataPropertyDescriptor");
+	  foreach(var pair in properties)
+      {
+#>
+public static readonly DataPropertyDescriptor<<#= pair.Type #>> <#= pair.Name #>Property; 
+<#+ 
+      }
+	  WriteLine("#endregion");
+	  WriteLine("");
+
+	  WriteLine("#region Setup and Teardown");
+	  GenerateStaticConstructor(constructorName, typeName);
+	  GenerateVirtualInitializeSession();	  
+	  WriteLine("#endregion");
+
+	  foreach(var pair in properties)
+      {		  
+		  T4EmitDataPropertyParts(pair.Type, FieldName(pair.Name), pair.Name, pair.IsPartial);		  
+      }
+	  PopIndent();
+	  properties.Clear();
+  }
+
+
+internal void T4EmitDataPropertyParts(string returnType, string fieldName, string propertyName, bool isPartial)
+{
+#>
+
+#region <#= propertyName #>
+private DataPropertyStore <#= fieldName #>Store;
+private EventHandler <#= fieldName #>Changed;
+private EventHandler <#= fieldName #>AvailabilityChanged;
+
+<#+ if (isPartial) { #>
+public partial <#= returnType #> <#= propertyName #> { get; set; }
+<#+ } else { #>
+public <#= returnType #> <#= propertyName #> {
+	get { return this.GetValue(<#= propertyName #>Property); }
+	set { this.SetValue(<#= propertyName #>Property, value); }
+}
+<#+ } #>
+
+[NotifyConsumer]
+private void <#= propertyName #>_ValueChanged(object sender, EventArgs e)
+{
+    if (<#= fieldName #>Changed != null)
+        <#= fieldName #>Changed(this, e);
+}
+[NotifyConsumer]
+private void <#= propertyName #>_IsAvailableChanged(object sender, EventArgs e)
+{
+    if (<#= fieldName #>AvailabilityChanged != null)
+        <#= fieldName #>AvailabilityChanged(this, e);
+}
+public virtual bool Is<#= propertyName #>Available
+{
+    get { return <#= fieldName #>Store.IsAvailable; }
+}
+/// <summary>
+/// Event meant to notify the client that Is<#= propertyName #>Available has changed. 
+/// </summary>
+/// <remarks>
+/// This event will not be raised until the stack is unwinding from the application layer. 
+/// </remarks>
+public event EventHandler Is<#= propertyName #>AvailableChanged
+{
+    add { <#= fieldName #>AvailabilityChanged += value; }
+    remove { <#= fieldName #>AvailabilityChanged -= value; }
+}
+/// <summary>
+/// Event meant to notify the client that <#= propertyName #> has changed. 
+/// </summary>
+/// <remarks>
+/// This event will not be raised until the stack is unwinding from the application layer. 
+/// </remarks>
+public event EventHandler <#= propertyName #>Changed
+{
+    add { <#= fieldName #>Changed += value; }
+    remove { <#= fieldName #>Changed -= value; }
+}
+#endregion
+<#+ 
+}
+
+internal void T4EmitInitializeDataProperty(string returnType, string fieldName, string propertyName)
+{
+#>
+<#= fieldName #>Store = GetStore<<#= returnType #>>(<#= propertyName #>Property);
+<#= fieldName #>Store.ValueChanged += <#= propertyName #>_ValueChanged;
+<#= fieldName #>Store.IsAvailableChanged += <#= propertyName #>_IsAvailableChanged;
+<#+ 
+}
+
+/// <summary>
+/// Returns the passed in identifier with the first letter changed to lowercase
+/// </summary>
+private string FieldName(string identifier)
+{
+    if (String.IsNullOrEmpty(identifier))
+    {
+        return "_" + identifier;
+    }
+	
+    if (identifier.Length == 1)
+    {
+        return "_" + identifier[0].ToString(CultureInfo.InvariantCulture);//.ToLowerInvariant();
+    }
+	
+    return "_" + identifier[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + identifier.Substring(1);
+}
+#>
